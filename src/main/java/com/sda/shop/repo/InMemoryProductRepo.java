@@ -1,6 +1,7 @@
 package com.sda.shop.repo;
 
 import com.sda.shop.dto.CreateProductDto;
+import com.sda.shop.dto.EditProductDto;
 import com.sda.shop.model.Product;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class InMemoryProductRepo implements ProductRepo {
 
     private static List<Product> productList;
-
     private static AtomicInteger idCounter;
 
     public InMemoryProductRepo() {
@@ -36,17 +36,60 @@ public class InMemoryProductRepo implements ProductRepo {
         productList.add(product);
     }
 
-
-
-    @Override
-    public Optional<Product> findProductById(Integer id) {
-        return Optional.empty();
-    }
-
     @Override
     public List<Product> findAll() {
         return productList;
     }
 
+    @Override
+    public boolean deleteById(Integer id) {
+        return productList.removeIf(product -> id.equals(product.getId()));
+    }
 
+    @Override
+    public Product editProduct(Integer id, EditProductDto editProductDto) {
+        Optional<Product> productOptional = productList
+                .stream()
+                .filter(product1 -> product1.getId().equals(id))
+                .findFirst();
+
+        if (productOptional.isEmpty()) {
+            return null;
+        }
+
+        Integer oldPrice = productOptional.get().getPrice();
+        Integer oldQuantity = productOptional.get().getQuantity();
+        String oldImageUrl = productOptional.get().getImageUrl();
+        String oldDescription = productOptional.get().getDescription();
+
+        if (editProductDto.getPrice() != null) {
+            oldPrice = editProductDto.getPrice();
+        }
+
+        if (editProductDto.getQuantity() != null) {
+            oldQuantity = editProductDto.getQuantity();
+        }
+        if (editProductDto.getImageUrl() != null) {
+            oldImageUrl = editProductDto.getImageUrl();
+        }
+
+        if (editProductDto.getDescription() != null) {
+            oldDescription = editProductDto.getDescription();
+        }
+
+        Product productNew = Product.builder()
+                .id(id)
+                .price(oldPrice)
+                .quantity(oldQuantity)
+                .imageUrl(oldImageUrl)
+                .description(oldDescription)
+                .build();
+        System.out.println("Metoda edit!!");
+        System.out.println(productNew.toString());
+        int index = productList.indexOf(productOptional.get());
+       productList.set(index,productNew);
+       return productNew;
+
+
+    }
 }
