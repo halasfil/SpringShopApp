@@ -11,8 +11,11 @@ import java.time.LocalDateTime;
 
 public class Product {
     private Integer id;
+    private Integer price;
+    private Integer quantity;
     private String name;
     private String description;
+    private String imageUrl;
     private LocalDateTime creationTime;
 
 
